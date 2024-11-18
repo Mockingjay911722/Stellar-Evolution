@@ -16,11 +16,11 @@ def mass_evolution_of_gas_1(G, S,BH,WD,NS,steps, current_step=0, G_values=None, 
         NS_values = np.zeros(steps)
 
     # Store the current values of G,S,BH,WD and NS in the arrays
-    G_values[current_step] = np.array(G)
-    S_values[current_step] = np.array(S)
-    BH_values[current_step] = np.array(BH)
-    WD_values[current_step] = np.array(WD)
-    NS_values[current_step] = np.array(NS)
+    G_values[current_step] = G
+    S_values[current_step] = S
+    BH_values[current_step] = BH
+    WD_values[current_step] = WD
+    NS_values[current_step] = NS
 
 
     # Base case: if we've reached the desired number of steps, return the array and final G,S,BH,WD and NS.
