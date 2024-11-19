@@ -45,7 +45,7 @@ def plots_stars(s_values_division, steps, bins):
     plt.show()
     return
 
-def stars_to_remants(s_values_division, current_step = 0, steps, bins,  BH_values = None, NS_values = None, WD_values = None):
+def stars_to_remants(s_values_division, steps, bins, BH_values = None, NS_values = None, WD_values = None):
     if BH_values is None:
         BH_values = np.zeros((bins, steps))
     if NS_values is None:
@@ -53,27 +53,37 @@ def stars_to_remants(s_values_division, current_step = 0, steps, bins,  BH_value
     if WD_values is None:
         WD_values = np.zeros((bins,steps))
 
-    # We do this from each entry to each entry
-
     for i in range(bins):
-        BH_values[j, i] = s_values_division[j, i] * 0.01
-        NS_values[j, i] = s_values_division[j, i] * 0.02
-        WD_values[j, i] = s_values_division [j, i] * 0.03
-    #
-    # if current_step == steps - 1:
-    #     return BH_values, NS_values, WD_values
-    #
-    # return stars_to_remants(s_values_division)
-    # if current_step == steps - 1 :
-    #     return BH_values, NS_values, WD_values
-    
-    # for j in range(steps):
-    #     for i in range(bins):
-    #         BH_values[j,i] = s_values_division[j,i] * 0.01
-    #         NS_values[j,i] = s_values_division[j,i] * 0.02
-    #         WD_values[j,i] = s_values_division [j,i] * 0.03
-    # steps         
+        for j in range(steps):
+            BH_values[i, j] = s_values_division[i, j] * 0.01
+            NS_values[i, j] = s_values_division[i, j] * 0.02
+            WD_values[i, j] = s_values_division [i, j] * 0.03
+    return BH_values, NS_values, WD_values
 
+
+def calculate_total_mass(s_values_division, G_values, BH_values, NS_values, WD_values, steps):
+    # Total stellar mass across bins for each step
+    total_stellar_mass = np.sum(s_values_division, axis=0)  # Sum over bins (rows)
+
+    # Total gas mass (G_values is already a 1D array for each step)
+    total_gas_mass = G_values
+
+    # Total mass of remnants across bins for each step
+    total_bh_mass = np.sum(BH_values, axis=0)  # Sum over bins (rows)
+    total_ns_mass = np.sum(NS_values, axis=0)  # Sum over bins (rows)
+    total_wd_mass = np.sum(WD_values, axis=0)  # Sum over bins (rows)
+
+    # Combine all into a dictionary
+    total_mass_dict = {
+        "step": np.arange(steps),  # Time steps
+        "stellar_mass": total_stellar_mass,
+        "gas_mass": total_gas_mass,
+        "BH_mass": total_bh_mass,
+        "NS_mass": total_ns_mass,
+        "WD_mass": total_wd_mass,
+        "total_mass": total_stellar_mass + total_gas_mass + total_bh_mass + total_ns_mass + total_wd_mass
+    }
+    return total_mass_dict
 
 
 # Try an example
@@ -83,4 +93,11 @@ s_values_division = stars_division(S_values, 100, 30)
 
 plots_stars(s_values_division,100,30)
 
-stars_to_remants(s_values_division, 100, 30)
+BH_values, NS_values, WD_values = stars_to_remants(s_values_division, 100, 30)
+
+# Calculate total masses for all time steps
+total_mass = calculate_total_mass(s_values_division, G_values, BH_values, NS_values, WD_values, 100)
+
+# Print total mass at each step
+for step in range(100):
+    print(f"Step {step}: Total Mass = {total_mass['total_mass'][step]:.2f}")
